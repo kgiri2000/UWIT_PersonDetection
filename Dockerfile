@@ -5,6 +5,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 #3.Copy dependencies files and install
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 #4.Copy code and YOLO model into container
