@@ -2,26 +2,26 @@ import cv2
 from ultralytics import YOLO
 import winsound  # Windows-safe beep
 
-# --- Config ---
+# Config
 CAMERA_INDEX = 0
 MODEL_PATH = "yolov8n.pt"
 MIN_AREA_RATIO = 0.03  # minimum box area / frame area to count
 
-# --- Load YOLO model ---
+# Load YOLO model
 model = YOLO(MODEL_PATH)
 
-# --- Open webcam ---
+# Open webcam
 cap = cv2.VideoCapture(CAMERA_INDEX)
 if not cap.isOpened():
     print("[ERROR] Could not open webcam.")
     exit()
 
-# --- Full-screen window ---
+#Full-screen window
 cv2.namedWindow("Person Detection", cv2.WND_PROP_FULLSCREEN)
 cv2.setWindowProperty("Person Detection", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 print("[INFO] Webcam opened. Press 'q' to quit.")
 
-# --- Tracking variables ---
+#Tracking variables
 current_ids = set()
 
 def play_beep():
