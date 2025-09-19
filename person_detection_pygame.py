@@ -102,9 +102,9 @@ while True:
     # Annotate frame
     annotated_frame = results[0].plot()
     cv2.putText(annotated_frame, f"Current in Frame: {person_count}", (20, 40),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     cv2.putText(annotated_frame, f"Total Unique Visitors: {total_unique}", (20, 80),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
     cv2.putText(annotated_frame, f"Avg Duration: {avg_duration} sec", (20, 120),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
