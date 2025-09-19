@@ -1,7 +1,7 @@
 import cv2
 from ultralytics import YOLO
 import numpy as np
-import winsound  # ✅ Replaced simpleaudio
+import winsound  #Replaced simpleaudio
 import time
 import csv
 import os
@@ -72,7 +72,7 @@ while True:
     current_time = time.time()
     if newcomers and (current_time - last_beep_time >= GLOBAL_BEEP_COOLDOWN):
         print(f"[INFO] New person(s) detected! IDs: {newcomers}")
-        play_beep()  # ✅ Now uses winsound
+        play_beep()  # Now uses winsound
         last_beep_time = current_time
 
     #Check for people who left frame
