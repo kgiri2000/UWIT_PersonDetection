@@ -1,33 +1,33 @@
 import cv2
 from ultralytics import YOLO
 import numpy as np
-import simpleaudio as sa
+import winsound  # ✅ Replaced simpleaudio
 import time
 import csv
 import os
 
-# --- Configuration ---
+#Configuration
 CAMERA_INDEX = 0
 MODEL_PATH = "yolov8n.pt"
 MIN_AREA_RATIO = 0.03
 GLOBAL_BEEP_COOLDOWN = 10  # seconds
 CSV_FILE = "visitor_log.csv"
 
-# --- Beep Sound ---
-def play_beep(frequency=440, duration=0.3, volume=0.3):
-    fs = 44100
-    t = np.linspace(0, duration, int(fs * duration), False)
-    wave = np.sin(frequency * 2 * np.pi * t)
-    audio = (wave * volume * 32767).astype(np.int16)
-    sa.play_buffer(audio, 1, 2, fs)  # Non-blocking
+#Beep Sound
+def play_beep(frequency=440, duration=300):
+    """
+    frequency: Hz (e.g., 440 = A4 note)
+    duration: milliseconds (e.g., 300 = 0.3s)
+    """
+    winsound.Beep(frequency, duration)  # Blocking beep
 
-# --- Initialize CSV ---
+#Initialize CSV
 if not os.path.exists(CSV_FILE):
     with open(CSV_FILE, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Person_ID", "First_Seen", "Last_Seen", "Duration_sec"])
 
-# --- Load model and camera ---
+# Load model and camera
 model = YOLO(MODEL_PATH)
 cap = cv2.VideoCapture(CAMERA_INDEX)
 if not cap.isOpened():
@@ -37,13 +37,13 @@ if not cap.isOpened():
 cv2.namedWindow("Person Detection", cv2.WND_PROP_FULLSCREEN)
 cv2.setWindowProperty("Person Detection", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-# --- Tracking variables ---
+#Tracking variables
 current_ids = set()
 last_beep_time = 0  # global cooldown
 person_times = {}   # track_id -> {"first_seen": timestamp, "last_seen": timestamp}
 completed_durations = []  # list of durations for finished visits
 
-# --- Main loop ---
+#Main loop
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -67,15 +67,15 @@ while True:
                 else:
                     person_times[track_id]["last_seen"] = time.time()
 
-    # --- Global cooldown beep ---
+    #Global cooldown beep
     newcomers = new_ids - current_ids
     current_time = time.time()
     if newcomers and (current_time - last_beep_time >= GLOBAL_BEEP_COOLDOWN):
         print(f"[INFO] New person(s) detected! IDs: {newcomers}")
-        play_beep()
+        play_beep()  # ✅ Now uses winsound
         last_beep_time = current_time
 
-    # --- Check for people who left frame ---
+    #Check for people who left frame
     left_ids = current_ids - new_ids
     for track_id in left_ids:
         first = person_times[track_id]["first_seen"]
@@ -109,7 +109,7 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-# --- Cleanup ---
+# Cleanup
 # Log remaining people still in frame
 for track_id in list(person_times.keys()):
     first = person_times[track_id]["first_seen"]
