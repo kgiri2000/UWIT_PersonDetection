@@ -14,6 +14,8 @@ MIN_AREA_RATIO = 0.03
 GLOBAL_BEEP_COOLDOWN = 10  # seconds
 CSV_FILE = "visitor_log.csv"
 SOUND_FILE = "notification.wav"  # use your WAV file
+active_message = []
+MESSAGE_DURATION = 5
 
 # Initialize Pygame mixer for sound
 pygame.mixer.init()
@@ -108,6 +110,7 @@ while True:
                 track_id not in beeped_ids and
                 (current_time - last_beep_time >= GLOBAL_BEEP_COOLDOWN)):
                 print(f"[INFO] Person {track_id} confirmed after {BEEP_DELAY} sec")
+                msg = f"Person {track_id} confirmed after {BEEP_DELAY} sec."
                 play_beep()
                 last_beep_time = current_time
                 '''
@@ -115,6 +118,7 @@ while True:
                 Need to find the better solution
                 '''
                 beeped_ids.add(track_id)
+                active_message.append((msg, time.time()))
 
 
     # Check for people who left frame
@@ -149,6 +153,18 @@ while True:
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
     cv2.putText(annotated_frame, f"Avg Duration: {avg_duration} sec", (20, 120),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+    
+    #Display the message
+    current_time = time.time()
+    y_offset = annotated_frame.shape[0]-20
+    for msg, ts in list(active_message):
+        if current_time - ts < MESSAGE_DURATION:
+            cv2.putText(annotated_frame, msg, (20, y_offset),
+                        cv2.FONT_HERSHEY_PLAIN, 1.2, (0,0,0), 1)
+            #stack message vertically
+            y_offset -=20 
+        else:
+            active_message.remove((msg, ts))
 
     # Display frame
     cv2.imshow("Person Detection", annotated_frame)
